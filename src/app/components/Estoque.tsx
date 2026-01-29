@@ -8,7 +8,6 @@ import { Label } from '@/app/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
 import { Alert, AlertDescription } from '@/app/components/ui/alert';
 import { toast } from 'sonner';
-import { projectId, publicAnonKey } from '/utils/supabase/info';
 
 export function Estoque() {
   const [estoque, setEstoque] = useState<any[]>([]);
@@ -31,16 +30,16 @@ export function Estoque() {
   const loadEstoque = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/estoque`,
-        {
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-        }
-      );
-      const data = await response.json();
-      setEstoque(data.estoque || []);
+      // TODO: Implementar integração com backend
+      // Supabase foi removido do projeto
+      
+      // Dados mockados para apresentação
+      const mockEstoque = [
+        { id: 1, nome: 'Farinha', unidade: 'kg', quantidade: 25, quantidadeMinima: 10, fornecedor: 'Supplier X', custoUnitario: 5.50 },
+        { id: 2, nome: 'Queijo Mozzarela', unidade: 'kg', quantidade: 8, quantidadeMinima: 10, fornecedor: 'Supplier Y', custoUnitario: 45.00 },
+      ];
+      
+      setEstoque(mockEstoque);
     } catch (error) {
       console.error('Error loading estoque:', error);
       toast.error('Erro ao carregar estoque');
@@ -50,69 +49,11 @@ export function Estoque() {
   };
 
   const handleCreateItem = async () => {
-    if (!novoItem.nome) {
-      toast.error('Preencha o nome do item');
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/estoque`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-          body: JSON.stringify(novoItem),
-        }
-      );
-
-      if (response.ok) {
-        toast.success('Item adicionado com sucesso!');
-        setIsDialogOpen(false);
-        setNovoItem({
-          nome: '',
-          unidade: 'kg',
-          quantidade: 0,
-          quantidadeMinima: 0,
-          fornecedor: '',
-          custoUnitario: 0,
-        });
-        loadEstoque();
-      } else {
-        toast.error('Erro ao adicionar item');
-      }
-    } catch (error) {
-      console.error('Error creating item:', error);
-      toast.error('Erro ao adicionar item');
-    }
+    //toast.info('Funcionalidade desabilitada para demonstração');
   };
 
   const handleUpdateQuantidade = async (itemId: string, novaQuantidade: number) => {
-    try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/estoque/${itemId}/quantidade`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-          body: JSON.stringify({ quantidade: novaQuantidade }),
-        }
-      );
-
-      if (response.ok) {
-        toast.success('Quantidade atualizada!');
-        loadEstoque();
-      } else {
-        toast.error('Erro ao atualizar quantidade');
-      }
-    } catch (error) {
-      console.error('Error updating quantidade:', error);
-      toast.error('Erro ao atualizar quantidade');
-    }
+    // Funcionalidade desabilitada para demonstração
   };
 
   const filteredEstoque = estoque.filter(item =>

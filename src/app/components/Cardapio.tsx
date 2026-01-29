@@ -9,7 +9,6 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Textarea } from '@/app/components/ui/textarea';
 import { Switch } from '@/app/components/ui/switch';
 import { toast } from 'sonner';
-import { projectId, publicAnonKey } from '/utils/supabase/info';
 
 export function Cardapio() {
   const [produtos, setProdutos] = useState<any[]>([]);
@@ -32,16 +31,16 @@ export function Cardapio() {
   const loadProdutos = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/produtos`,
-        {
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-        }
-      );
-      const data = await response.json();
-      setProdutos(data.produtos || []);
+      // TODO: Implementar integração com backend
+      // Supabase foi removido do projeto
+      
+      // Dados mockados para apresentação
+      const mockProdutos = [
+        { id: 1, nome: 'Pizza Margherita', categoria: 'pizza', tamanho: 'media', preco: 30.00, ativo: true },
+        { id: 2, nome: 'Pizza Calabresa', categoria: 'pizza', tamanho: 'media', preco: 32.00, ativo: true },
+      ];
+      
+      setProdutos(mockProdutos);
     } catch (error) {
       console.error('Error loading produtos:', error);
       toast.error('Erro ao carregar produtos');
@@ -51,69 +50,12 @@ export function Cardapio() {
   };
 
   const handleCreateProduto = async () => {
-    if (!novoProduto.nome || !novoProduto.preco) {
-      toast.error('Preencha todos os campos obrigatórios');
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/produtos`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-          body: JSON.stringify(novoProduto),
-        }
-      );
-
-      if (response.ok) {
-        toast.success('Produto criado com sucesso!');
-        setIsDialogOpen(false);
-        setNovoProduto({
-          nome: '',
-          categoria: 'pizza',
-          tamanho: 'media',
-          preco: 0,
-          descricao: '',
-          ativo: true,
-        });
-        loadProdutos();
-      } else {
-        toast.error('Erro ao criar produto');
-      }
-    } catch (error) {
-      console.error('Error creating produto:', error);
-      toast.error('Erro ao criar produto');
-    }
+    //toast.info('Funcionalidade desabilitada para demonstração');
   };
 
   const handleToggleAtivo = async (produtoId: string, ativo: boolean) => {
-    try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/produtos/${produtoId}`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-          body: JSON.stringify({ ativo }),
-        }
-      );
-
-      if (response.ok) {
-        toast.success('Produto atualizado!');
-        loadProdutos();
-      } else {
-        toast.error('Erro ao atualizar produto');
-      }
-    } catch (error) {
-      console.error('Error updating produto:', error);
-      toast.error('Erro ao atualizar produto');
-    }
+    // TODO: Implementar integração com backend
+    return;
   };
 
   const filteredProdutos = produtos.filter(produto =>

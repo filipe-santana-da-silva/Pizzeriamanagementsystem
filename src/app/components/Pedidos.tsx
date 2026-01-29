@@ -14,7 +14,6 @@ import {
 import { Label } from '@/app/components/ui/label';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
 import { toast } from 'sonner';
-import { projectId, publicAnonKey } from '/utils/supabase/info';
 
 export function Pedidos() {
   const [pedidos, setPedidos] = useState<any[]>([]);
@@ -26,6 +25,8 @@ export function Pedidos() {
     clienteNome: '',
     telefone: '',
     tipoPedido: 'delivery' as 'balcao' | 'delivery' | 'retirada',
+    plataforma: 'proprio' as 'proprio' | 'whatsapp' | 'ifood' | 'rappi' | 'uber',
+    numeroMesa: 1,
     endereco: '',
     formaPagamento: 'dinheiro',
     itens: [] as any[],
@@ -39,19 +40,46 @@ export function Pedidos() {
   const loadPedidos = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/pedidos`,
-        {
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-        }
-      );
-      const data = await response.json();
-      const pedidosOrdenados = (data.pedidos || []).sort(
-        (a: any, b: any) => new Date(b.criadoEm).getTime() - new Date(a.criadoEm).getTime()
-      );
-      setPedidos(pedidosOrdenados);
+      
+      const mockPedidos = [
+        { 
+          id: 1, 
+          clienteNome: 'João Silva', 
+          tipoPedido: 'balcao',
+          plataforma: 'proprio',
+          numeroMesa: 5,
+          status: 'pronto', 
+          valorTotal: 85.50, 
+          criadoEm: new Date().toISOString(),
+          itens: [{ nome: 'Pizza Margherita', quantidade: 1, valor: 35.00 }],
+          formaPagamento: 'dinheiro'
+        },
+        { 
+          id: 2, 
+          clienteNome: 'Maria Santos',
+          tipoPedido: 'delivery',
+          plataforma: 'whatsapp',
+          endereco: 'Rua A, 123',
+          status: 'preparo', 
+          valorTotal: 120.00, 
+          criadoEm: new Date().toISOString(),
+          itens: [{ nome: 'Pizza Calabresa', quantidade: 2, valor: 38.00 }],
+          formaPagamento: 'pix'
+        },
+        { 
+          id: 3, 
+          clienteNome: 'Carlos Oliveira',
+          tipoPedido: 'retirada',
+          plataforma: 'ifood',
+          status: 'pendente', 
+          valorTotal: 95.00, 
+          criadoEm: new Date().toISOString(),
+          itens: [{ nome: 'Pizza Frango', quantidade: 1, valor: 40.00 }],
+          formaPagamento: 'cartao'
+        },
+      ];
+      
+      setPedidos(mockPedidos);
     } catch (error) {
       console.error('Error loading pedidos:', error);
       toast.error('Erro ao carregar pedidos');
@@ -62,101 +90,41 @@ export function Pedidos() {
 
   const loadProdutos = async () => {
     try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/produtos`,
-        {
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-        }
-      );
-      const data = await response.json();
-      setProdutos(data.produtos || []);
+      const mockProdutos = [
+        { id: 1, nome: 'Pizza Margherita', valor: 35.00 },
+        { id: 2, nome: 'Pizza Calabresa', valor: 38.00 },
+        { id: 3, nome: 'Pizza Frango com Catupiry', valor: 40.00 },
+        { id: 4, nome: 'Pizza Portuguesa', valor: 42.00 },
+        { id: 5, nome: 'Refrigerante 2L', valor: 8.00 },
+        { id: 6, nome: 'Cerveja 600ml', valor: 6.50 },
+      ];
+      
+      setProdutos(mockProdutos);
     } catch (error) {
       console.error('Error loading produtos:', error);
     }
   };
 
   const handleCreatePedido = async () => {
-    if (!novoPedido.clienteNome || novoPedido.itens.length === 0) {
-      toast.error('Preencha o nome do cliente e adicione pelo menos um item');
-      return;
-    }
-
-    try {
-      const valorTotal = novoPedido.itens.reduce((acc, item) => acc + (item.valor * item.quantidade), 0);
-
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/pedidos`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-          body: JSON.stringify({
-            ...novoPedido,
-            valorTotal,
-          }),
-        }
-      );
-
-      if (response.ok) {
-        toast.success('Pedido criado com sucesso!');
-        setIsDialogOpen(false);
-        setNovoPedido({
-          clienteNome: '',
-          telefone: '',
-          tipoPedido: 'delivery',
-          endereco: '',
-          formaPagamento: 'dinheiro',
-          itens: [],
-        });
-        loadPedidos();
-      } else {
-        toast.error('Erro ao criar pedido');
-      }
-    } catch (error) {
-      console.error('Error creating pedido:', error);
-      toast.error('Erro ao criar pedido');
-    }
+    //toast.info('Funcionalidade desabilitada para demonstração');
   };
 
   const handleUpdateStatus = async (pedidoId: string, novoStatus: string) => {
-    try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/pedidos/${pedidoId}/status`,
-        {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-          body: JSON.stringify({ status: novoStatus }),
-        }
-      );
-
-      if (response.ok) {
-        toast.success('Status atualizado com sucesso!');
-        loadPedidos();
-      } else {
-        toast.error('Erro ao atualizar status');
-      }
-    } catch (error) {
-      console.error('Error updating status:', error);
-      toast.error('Erro ao atualizar status');
-    }
+    setPedidos(pedidos.map(p => 
+      p.id === pedidoId ? { ...p, status: novoStatus } : p
+    ));
+    toast.success('Status atualizado');
   };
 
   const addItemToPedido = (produtoId: string) => {
-    const produto = produtos.find(p => p.id === produtoId);
+    const produto = produtos.find(p => p.id === parseInt(produtoId));
     if (!produto) return;
 
     const newItem = {
       produtoId: produto.id,
       nome: produto.nome,
       quantidade: 1,
-      valor: produto.preco,
+      valor: produto.valor,
       observacoes: '',
     };
 
@@ -265,22 +233,36 @@ export function Pedidos() {
                   </Select>
                 </div>
                 <div className="space-y-2">
-                  <Label>Forma de Pagamento</Label>
+                  <Label>Plataforma</Label>
                   <Select
-                    value={novoPedido.formaPagamento}
-                    onValueChange={(value) => setNovoPedido({ ...novoPedido, formaPagamento: value })}
+                    value={novoPedido.plataforma}
+                    onValueChange={(value: any) => setNovoPedido({ ...novoPedido, plataforma: value })}
                   >
                     <SelectTrigger>
                       <SelectValue />
                     </SelectTrigger>
                     <SelectContent>
-                      <SelectItem value="dinheiro">Dinheiro</SelectItem>
-                      <SelectItem value="cartao">Cartão</SelectItem>
-                      <SelectItem value="pix">PIX</SelectItem>
+                      <SelectItem value="proprio">Próprio Sistema</SelectItem>
+                      <SelectItem value="whatsapp">WhatsApp</SelectItem>
+                      <SelectItem value="ifood">iFood</SelectItem>
+                      <SelectItem value="rappi">Rappi</SelectItem>
+                      <SelectItem value="uber">Uber Eats</SelectItem>
                     </SelectContent>
                   </Select>
                 </div>
               </div>
+
+              {novoPedido.tipoPedido === 'balcao' && (
+                <div className="space-y-2">
+                  <Label>Número da Mesa</Label>
+                  <Input
+                    type="number"
+                    min="1"
+                    value={novoPedido.numeroMesa}
+                    onChange={(e) => setNovoPedido({ ...novoPedido, numeroMesa: parseInt(e.target.value) })}
+                  />
+                </div>
+              )}
 
               {novoPedido.tipoPedido === 'delivery' && (
                 <div className="space-y-2">
@@ -294,15 +276,32 @@ export function Pedidos() {
               )}
 
               <div className="space-y-2">
+                <Label>Forma de Pagamento</Label>
+                <Select
+                  value={novoPedido.formaPagamento}
+                  onValueChange={(value) => setNovoPedido({ ...novoPedido, formaPagamento: value })}
+                >
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
+                  <SelectContent>
+                    <SelectItem value="dinheiro">Dinheiro</SelectItem>
+                    <SelectItem value="cartao">Cartão</SelectItem>
+                    <SelectItem value="pix">PIX</SelectItem>
+                  </SelectContent>
+                </Select>
+              </div>
+
+              <div className="space-y-2">
                 <Label>Adicionar Produto</Label>
                 <Select onValueChange={addItemToPedido}>
                   <SelectTrigger>
                     <SelectValue placeholder="Selecione um produto" />
                   </SelectTrigger>
                   <SelectContent>
-                    {produtos.filter(p => p.ativo).map((produto) => (
-                      <SelectItem key={produto.id} value={produto.id}>
-                        {produto.nome} - R$ {produto.preco?.toFixed(2)}
+                    {produtos.map((produto) => (
+                      <SelectItem key={produto.id} value={produto.id.toString()}>
+                        {produto.nome} - R$ {produto.valor?.toFixed(2)}
                       </SelectItem>
                     ))}
                   </SelectContent>
@@ -315,26 +314,26 @@ export function Pedidos() {
                   <div className="border rounded-lg divide-y">
                     {novoPedido.itens.map((item, index) => (
                       <div key={index} className="p-3 flex items-center justify-between">
-                        <div className="flex-1">
-                          <div className="font-medium">{item.nome}</div>
-                          <div className="text-sm text-gray-500">R$ {item.valor?.toFixed(2)}</div>
-                        </div>
-                        <div className="flex items-center gap-2">
-                          <Input
-                            type="number"
-                            min="1"
-                            value={item.quantidade}
-                            onChange={(e) => updateItemQuantity(index, parseInt(e.target.value) || 1)}
-                            className="w-20"
-                          />
-                          <Button
-                            variant="ghost"
-                            size="sm"
-                            onClick={() => removeItemFromPedido(index)}
-                          >
-                            Remover
-                          </Button>
-                        </div>
+                    <div className="space-y-2">
+                      <div className="font-medium">{item.nome}</div>
+                      <div className="text-sm text-gray-500">R$ {item.valor?.toFixed(2)}</div>
+                    </div>
+                    <div className="flex items-center gap-2">
+                      <Input
+                        type="number"
+                        min="1"
+                        value={item.quantidade}
+                        onChange={(e) => updateItemQuantity(index, parseInt(e.target.value) || 1)}
+                        className="w-20"
+                      />
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={() => removeItemFromPedido(index)}
+                      >
+                        Remover
+                      </Button>
+                    </div>
                       </div>
                     ))}
                   </div>
@@ -389,45 +388,49 @@ export function Pedidos() {
                     <div>
                       <CardTitle className="text-lg">{pedido.clienteNome || 'Cliente sem nome'}</CardTitle>
                       <p className="text-sm text-gray-500 mt-1">
-                        {pedido.telefone} • {pedido.tipoPedido} • {new Date(pedido.criadoEm).toLocaleString('pt-BR')}
+                        {pedido.telefone && `${pedido.telefone} • `}
+                        {pedido.tipoPedido === 'balcao' && `Mesa ${pedido.numeroMesa} • `}
+                        {pedido.tipoPedido === 'delivery' && `${pedido.endereco} • `}
+                        {pedido.plataforma} • {new Date(pedido.criadoEm).toLocaleString('pt-BR')}
                       </p>
                     </div>
                     <div className="text-right">
                       <div className="text-2xl font-bold">R$ {pedido.valorTotal?.toFixed(2)}</div>
-                      <Select
-                        value={pedido.status}
-                        onValueChange={(value) => handleUpdateStatus(pedido.id, value)}
-                      >
-                        <SelectTrigger className="mt-2">
-                          <SelectValue />
-                        </SelectTrigger>
-                        <SelectContent>
-                          <SelectItem value="pendente">Pendente</SelectItem>
-                          <SelectItem value="preparo">Em Preparo</SelectItem>
-                          <SelectItem value="pronto">Pronto</SelectItem>
-                          <SelectItem value="entregue">Entregue</SelectItem>
-                          <SelectItem value="cancelado">Cancelado</SelectItem>
-                        </SelectContent>
-                      </Select>
+                      <p className="text-sm text-gray-500 mt-1">{pedido.status}</p>
                     </div>
                   </div>
                 </CardHeader>
                 <CardContent>
-                  {pedido.itens && pedido.itens.length > 0 && (
+                  <div className="space-y-3">
                     <div className="space-y-2">
-                      {pedido.itens.map((item: any, index: number) => (
-                        <div key={index} className="flex justify-between text-sm">
-                          <span>{item.quantidade}x {item.nome}</span>
-                          <span className="text-gray-600">R$ {(item.valor * item.quantidade).toFixed(2)}</span>
-                        </div>
-                      ))}
+                      {pedido.itens && pedido.itens.length > 0 && (
+                        <>
+                          <p className="font-medium">Itens:</p>
+                          {pedido.itens.map((item: any, index: number) => (
+                            <div key={index} className="flex justify-between text-sm">
+                              <span>{item.quantidade}x {item.nome}</span>
+                              <span className="text-gray-600">R$ {(item.valor * item.quantidade).toFixed(2)}</span>
+                            </div>
+                          ))}
+                        </>
+                      )}
                     </div>
-                  )}
-                  {pedido.endereco && (
-                    <div className="mt-3 pt-3 border-t text-sm text-gray-600">
-                      <strong>Endereço:</strong> {pedido.endereco}
-                    </div>
-                  )}
+                    <Select
+                      value={pedido.status}
+                      onValueChange={(value) => handleUpdateStatus(pedido.id, value)}
+                    >
+                      <SelectTrigger>
+                        <SelectValue />
+                      </SelectTrigger>
+                      <SelectContent>
+                        <SelectItem value="pendente">Pendente</SelectItem>
+                        <SelectItem value="preparo">Em Preparo</SelectItem>
+                        <SelectItem value="pronto">Pronto</SelectItem>
+                        <SelectItem value="entregue">Entregue</SelectItem>
+                        <SelectItem value="cancelado">Cancelado</SelectItem>
+                      </SelectContent>
+                    </Select>
+                  </div>
                 </CardContent>
               </Card>
             ))

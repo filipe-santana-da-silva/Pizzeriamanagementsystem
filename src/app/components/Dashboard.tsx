@@ -1,12 +1,11 @@
 import { useEffect, useState } from 'react';
 import { TrendingUp, ShoppingCart, Package, DollarSign, AlertTriangle } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card';
-import { projectId, publicAnonKey } from '/utils/supabase/info';
 
 interface DashboardStats {
   pedidosHoje: number;
   vendasHoje: number;
-  estoqu<baixo: number;
+  estoqueBaixo: number;
   ticketMedio: number;
 }
 
@@ -28,52 +27,62 @@ export function Dashboard() {
     try {
       setLoading(true);
       
-      // Buscar relatório de vendas do dia
-      const vendasRes = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/relatorios/vendas?periodo=hoje`,
-        {
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-        }
-      );
-      const vendasData = await vendasRes.json();
-
-      // Buscar alertas de estoque
-      const estoqueRes = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/relatorios/estoque-baixo`,
-        {
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-        }
-      );
-      const estoqueData = await estoqueRes.json();
-
-      // Buscar pedidos recentes
-      const pedidosRes = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/pedidos`,
-        {
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-        }
-      );
-      const pedidosData = await pedidosRes.json();
-
-      setStats({
-        pedidosHoje: vendasData.quantidadePedidos || 0,
-        vendasHoje: vendasData.totalVendas || 0,
-        estoqueBaixo: estoqueData.alertas?.length || 0,
-        ticketMedio: vendasData.ticketMedio || 0,
-      });
-
-      // Ordenar pedidos por data (mais recentes primeiro) e pegar os 5 primeiros
-      const pedidosOrdenados = (pedidosData.pedidos || [])
-        .sort((a: any, b: any) => new Date(b.criadoEm).getTime() - new Date(a.criadoEm).getTime())
-        .slice(0, 5);
+      // Simular delay de carregamento
+      await new Promise(resolve => setTimeout(resolve, 800));
       
-      setPedidosRecentes(pedidosOrdenados);
+      // Mock data
+      const mockStats: DashboardStats = {
+        pedidosHoje: 24,
+        vendasHoje: 1250.50,
+        estoqueBaixo: 3,
+        ticketMedio: 52.10,
+      };
+
+      const mockPedidos = [
+        {
+          id: '1',
+          clienteNome: 'João Silva',
+          tipoPedido: 'Delivery',
+          criadoEm: new Date(Date.now() - 5 * 60000).toISOString(),
+          valorTotal: 89.90,
+          status: 'entregue',
+        },
+        {
+          id: '2',
+          clienteNome: 'Maria Santos',
+          tipoPedido: 'Balcão',
+          criadoEm: new Date(Date.now() - 15 * 60000).toISOString(),
+          valorTotal: 45.50,
+          status: 'pronto',
+        },
+        {
+          id: '3',
+          clienteNome: 'Pedro Oliveira',
+          tipoPedido: 'Delivery',
+          criadoEm: new Date(Date.now() - 25 * 60000).toISOString(),
+          valorTotal: 125.80,
+          status: 'preparo',
+        },
+        {
+          id: '4',
+          clienteNome: 'Ana Costa',
+          tipoPedido: 'Balcão',
+          criadoEm: new Date(Date.now() - 35 * 60000).toISOString(),
+          valorTotal: 67.30,
+          status: 'pendente',
+        },
+        {
+          id: '5',
+          clienteNome: 'Carlos Mendes',
+          tipoPedido: 'Delivery',
+          criadoEm: new Date(Date.now() - 45 * 60000).toISOString(),
+          valorTotal: 98.50,
+          status: 'entregue',
+        },
+      ];
+
+      setStats(mockStats);
+      setPedidosRecentes(mockPedidos);
     } catch (error) {
       console.error('Error loading dashboard data:', error);
     } finally {

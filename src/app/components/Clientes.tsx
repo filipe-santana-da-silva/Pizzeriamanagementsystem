@@ -8,7 +8,6 @@ import { Label } from '@/app/components/ui/label';
 import { Textarea } from '@/app/components/ui/textarea';
 import { Badge } from '@/app/components/ui/badge';
 import { toast } from 'sonner';
-import { projectId, publicAnonKey } from '/utils/supabase/info';
 
 export function Clientes() {
   const [clientes, setClientes] = useState<any[]>([]);
@@ -29,19 +28,16 @@ export function Clientes() {
   const loadClientes = async () => {
     try {
       setLoading(true);
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/clientes`,
-        {
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-        }
-      );
-      const data = await response.json();
-      const clientesOrdenados = (data.clientes || []).sort((a: any, b: any) =>
-        (b.pedidosRealizados || 0) - (a.pedidosRealizados || 0)
-      );
-      setClientes(clientesOrdenados);
+      // TODO: Implementar integração com backend
+      // Supabase foi removido do projeto
+      
+      // Dados mockados para apresentação
+      const mockClientes = [
+        { id: 1, nome: 'João Silva', telefone: '(11) 99999-9999', email: 'joao@example.com', pedidosRealizados: 5, pontosFidelidade: 250 },
+        { id: 2, nome: 'Maria Santos', telefone: '(11) 98888-8888', email: 'maria@example.com', pedidosRealizados: 12, pontosFidelidade: 600 },
+      ];
+      
+      setClientes(mockClientes);
     } catch (error) {
       console.error('Error loading clientes:', error);
       toast.error('Erro ao carregar clientes');
@@ -51,41 +47,7 @@ export function Clientes() {
   };
 
   const handleCreateCliente = async () => {
-    if (!novoCliente.nome || !novoCliente.telefone) {
-      toast.error('Preencha nome e telefone');
-      return;
-    }
-
-    try {
-      const response = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/clientes`,
-        {
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-          body: JSON.stringify(novoCliente),
-        }
-      );
-
-      if (response.ok) {
-        toast.success('Cliente cadastrado com sucesso!');
-        setIsDialogOpen(false);
-        setNovoCliente({
-          nome: '',
-          telefone: '',
-          email: '',
-          endereco: '',
-        });
-        loadClientes();
-      } else {
-        toast.error('Erro ao cadastrar cliente');
-      }
-    } catch (error) {
-      console.error('Error creating cliente:', error);
-      toast.error('Erro ao cadastrar cliente');
-    }
+    //toast.info('Funcionalidade desabilitada para demonstração');
   };
 
   const filteredClientes = clientes.filter(cliente =>

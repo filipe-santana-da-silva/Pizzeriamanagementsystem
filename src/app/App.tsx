@@ -7,8 +7,13 @@ import { Cardapio } from '@/app/components/Cardapio';
 import { Estoque } from '@/app/components/Estoque';
 import { Clientes } from '@/app/components/Clientes';
 import { Relatorios } from '@/app/components/Relatorios';
+import { ControleFinanceiro } from '@/app/components/ControleFinanceiro';
+import { NotaFiscal } from '@/app/components/NotaFiscal';
+import { Entregas } from '@/app/components/Entregas';
+import { Cozinha } from '@/app/components/Cozinha';
+import { Permissoes } from '@/app/components/Permissoes';
 
-type Page = 'dashboard' | 'pedidos' | 'cardapio' | 'estoque' | 'clientes' | 'relatorios';
+type Page = 'dashboard' | 'pedidos' | 'cardapio' | 'estoque' | 'clientes' | 'relatorios' | 'financeiro' | 'notafiscal' | 'entregas' | 'cozinha' | 'permissoes';
 
 export default function App() {
   const [currentPage, setCurrentPage] = useState<Page>('dashboard');
@@ -19,6 +24,8 @@ export default function App() {
         return <Dashboard />;
       case 'pedidos':
         return <Pedidos />;
+      case 'cozinha':
+        return <Cozinha />;
       case 'cardapio':
         return <Cardapio />;
       case 'estoque':
@@ -27,6 +34,14 @@ export default function App() {
         return <Clientes />;
       case 'relatorios':
         return <Relatorios />;
+      case 'financeiro':
+        return <ControleFinanceiro />;
+      case 'notafiscal':
+        return <NotaFiscal />;
+      case 'entregas':
+        return <Entregas />;
+      case 'permissoes':
+        return <Permissoes />;
       default:
         return <Dashboard />;
     }

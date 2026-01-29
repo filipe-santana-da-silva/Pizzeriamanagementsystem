@@ -3,7 +3,6 @@ import { TrendingUp, DollarSign, ShoppingCart, Package } from 'lucide-react';
 import { Card, CardContent, CardHeader, CardTitle } from '@/app/components/ui/card';
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@/app/components/ui/select';
 import { BarChart, Bar, XAxis, YAxis, CartesianGrid, Tooltip, ResponsiveContainer, PieChart, Pie, Cell, Legend } from 'recharts';
-import { projectId, publicAnonKey } from '/utils/supabase/info';
 
 export function Relatorios() {
   const [periodo, setPeriodo] = useState('mes');
@@ -19,29 +18,27 @@ export function Relatorios() {
     try {
       setLoading(true);
 
-      // Carregar relatório de vendas
-      const vendasRes = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/relatorios/vendas?periodo=${periodo}`,
-        {
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-        }
-      );
-      const vendasData = await vendasRes.json();
-      setVendas(vendasData);
+      // TODO: Implementar integração com backend para carregar relatórios
+      // Supabase foi removido do projeto
+      
+      // Dados mockados para apresentação
+      const mockVendas = {
+        totalVendas: 2450.50,
+        quantidadePedidos: 15,
+        ticketMedio: 163.37,
+        periodoAtual: getPeriodoLabel(periodo),
+      };
 
-      // Carregar produtos populares
-      const produtosRes = await fetch(
-        `https://${projectId}.supabase.co/functions/v1/make-server-d5c5d82b/relatorios/produtos-populares`,
-        {
-          headers: {
-            'Authorization': `Bearer ${publicAnonKey}`,
-          },
-        }
-      );
-      const produtosData = await produtosRes.json();
-      setProdutosPopulares(produtosData.produtosPopulares?.slice(0, 10) || []);
+      const mockProdutosPopulares = [
+        { nome: 'Pizza Margherita', quantidade: 45, receita: 450 },
+        { nome: 'Pizza Calabresa', quantidade: 38, receita: 380 },
+        { nome: 'Pizza Portuguesa', quantidade: 32, receita: 320 },
+        { nome: 'Refrigerante 2L', quantidade: 28, receita: 140 },
+        { nome: 'Cerveja', quantidade: 25, receita: 125 },
+      ];
+
+      setVendas(mockVendas);
+      setProdutosPopulares(mockProdutosPopulares);
     } catch (error) {
       console.error('Error loading relatorios:', error);
     } finally {

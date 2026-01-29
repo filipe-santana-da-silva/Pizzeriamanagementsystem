@@ -1,6 +1,6 @@
-import { Home, ShoppingCart, Pizza, Package, Users, BarChart3 } from 'lucide-react';
+import { Home, ShoppingCart, Pizza, Package, Users, BarChart3, DollarSign, FileText, Truck, UtensilsCrossed, Lock } from 'lucide-react';
 
-type Page = 'dashboard' | 'pedidos' | 'cardapio' | 'estoque' | 'clientes' | 'relatorios';
+type Page = 'dashboard' | 'pedidos' | 'cardapio' | 'estoque' | 'clientes' | 'relatorios' | 'financeiro' | 'notafiscal' | 'entregas' | 'cozinha' | 'permissoes';
 
 interface SidebarProps {
   currentPage: Page;
@@ -10,10 +10,15 @@ interface SidebarProps {
 const menuItems = [
   { id: 'dashboard' as Page, label: 'Dashboard', icon: Home },
   { id: 'pedidos' as Page, label: 'Pedidos', icon: ShoppingCart },
+  { id: 'cozinha' as Page, label: 'Cozinha', icon: UtensilsCrossed },
   { id: 'cardapio' as Page, label: 'Cardápio', icon: Pizza },
   { id: 'estoque' as Page, label: 'Estoque', icon: Package },
   { id: 'clientes' as Page, label: 'Clientes', icon: Users },
   { id: 'relatorios' as Page, label: 'Relatórios', icon: BarChart3 },
+  { id: 'financeiro' as Page, label: 'Financeiro', icon: DollarSign },
+  { id: 'notafiscal' as Page, label: 'Notas Fiscais', icon: FileText },
+  { id: 'entregas' as Page, label: 'Entregas', icon: Truck },
+  { id: 'permissoes' as Page, label: 'Permissões', icon: Lock },
 ];
 
 export function Sidebar({ currentPage, onNavigate }: SidebarProps) {
